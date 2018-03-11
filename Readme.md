@@ -24,11 +24,11 @@ or collect data from sensors.
 
 Get data from sensors
     
-    curl raspihost:8000/sensors
+    curl raspihost:8000/
     
 Make motors move forward
     
-    curl raspihost:8000/1/1
+    curl raspihost:8000/motors/-1/-1
     
 ### Contact
 

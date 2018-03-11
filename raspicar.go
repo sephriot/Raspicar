@@ -15,8 +15,8 @@ func ReadParams() Manager {
 	manager.leftMotor.gpio2 = rpio.Pin(*flag.Int("LMG2", 20, "Left motor GPIO input pin number 2"))
 	manager.leftMotor.enable = rpio.Pin(*flag.Int("LME", 21, "Left motor GPIO enable pin number"))
 
-	manager.rightMotor.gpio1 = rpio.Pin(*flag.Int("RMG1", 13, "Right motor GPIO input pin number 1"))
-	manager.rightMotor.gpio2 = rpio.Pin(*flag.Int("RMG2", 19, "Right motor GPIO input pin number 2"))
+	manager.rightMotor.gpio1 = rpio.Pin(*flag.Int("RMG1", 19, "Right motor GPIO input pin number 1"))
+	manager.rightMotor.gpio2 = rpio.Pin(*flag.Int("RMG2", 13, "Right motor GPIO input pin number 2"))
 	manager.rightMotor.enable = rpio.Pin(*flag.Int("RME", 26, "Right motor GPIO enable pin number"))
 
 	manager.frontSensor.trigger = rpio.Pin(*flag.Int("FST", 8, "Front sensor trigger pin number"))

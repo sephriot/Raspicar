@@ -2,10 +2,10 @@ package main
 
 import (
 	"net/http"
-	"encoding/json"
 	"log"
 	"strings"
 	"strconv"
+	"fmt"
 )
 
 type Manager struct {
@@ -17,56 +17,51 @@ type Manager struct {
 	bindPort string
 }
 
-type SensorResponse struct {
-	front float64
-	back  float64
-}
+var (
+	requestNumber = 0
+)
 
 func (m *Manager) SensorHandler(w http.ResponseWriter, r *http.Request) {
-
-	sensorData := SensorResponse{}
-	sensorData.back = m.backSensor.GetValue()
-	sensorData.front = m.frontSensor.GetValue()
-	ret, err := json.Marshal(sensorData)
-	if err != nil {
-		w.WriteHeader(500)
-		log.Println("Json parsing error")
-		return
-	}
-
-	w.Write(ret)
-	w.WriteHeader(200)
+	log.Println("Handling request", requestNumber, r.URL.String())
+	requestNumber++
+	fmt.Fprintf(w, "{\"front\":\"%f\",\"back\":\"%f\"}", m.frontSensor.GetValue(), m.backSensor.GetValue())
 }
 
 func (m *Manager) MotorHandler(w http.ResponseWriter, r *http.Request) {
 
+	log.Println("Handling request", requestNumber, r.URL.String())
+	requestNumber++
 	arr := strings.Split(r.URL.String(), "/")
 
-	if len(arr) <  2 {
+	if len(arr) <  4 {
 		log.Println("Incorrect request", r.URL.String())
 		w.WriteHeader(500)
 		return
 	}
 
-	left, err := strconv.Atoi(arr[1])
+	left, err := strconv.Atoi(arr[2])
 	if err != nil {
 		log.Println("Incorrect request", r.URL.String())
 		w.WriteHeader(500)
 		return
 	}
 
-	right, err := strconv.Atoi(arr[2])
+	right, err := strconv.Atoi(arr[3])
 	if err != nil {
 		log.Println("Incorrect request", r.URL.String())
 		w.WriteHeader(500)
 		return
 	}
 
-	m.leftMotor.SetDirection(left)
-	m.rightMotor.SetDirection(right)
+	if requestNumber % 2 == 0 {
+		m.leftMotor.SetDirection(left)
+		m.rightMotor.SetDirection(right)
+	} else {
+		m.rightMotor.SetDirection(right)
+		m.leftMotor.SetDirection(left)
+	}
 
 	w.Write([]byte("OK"))
-	w.WriteHeader(200)
 }
 
 func (m *Manager) Run() {
@@ -76,7 +71,7 @@ func (m *Manager) Run() {
 	go m.backSensor.Run()
 	go m.frontSensor.Run()
 
-	http.HandleFunc("/sensors", m.SensorHandler)
-	http.HandleFunc("/", m.MotorHandler)
+	http.HandleFunc("/", m.SensorHandler)
+	http.HandleFunc("/motors/", m.MotorHandler)
 	http.ListenAndServe(":"+ m.bindPort, nil)
 }

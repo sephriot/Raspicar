@@ -26,7 +26,7 @@ func (m *Motor) Run() {
 	m.gpio1.Output()
 	m.gpio2.Output()
 	m.enable.Output()
-	sleepTime := time.Second / 4
+	sleepTime := time.Second / 10
 
 	for {
 		if m.direction == Forward {
